@@ -39,16 +39,87 @@ function show(req, res) {
 
 
 function store(req, res) {
-    res.send('Creazione nuovo post');
+  // res.send('Creazione nuovo post');
+
+   const nuovoId = Date.now();
+
+    const nuovoPost = {
+        id: nuovoId,
+        titolo: req.body.titolo,
+        immagine: req.body.immagine,
+        ingredienti: req.body.ingredienti
+    }
+
+    Posts.push(nuovoPost);
+
+    console.log(Posts);
+
+
+    res.status(201);
+
+    res.json(nuovoPost);
+
 }
 
 function update(req, res) {
-    res.send('Modifica integrale del post' + req.params.id);
+
+    const id = parseInt(req.params.id)
+    
+    const postDaAggiornare = Posts.find(post => post.id === id);
+
+   
+    if (!postDaAggiornare) {
+        res.status(404);
+
+        return res.json({
+            error: "Not Found",
+            message: "Post non trovato"
+        })
+    }
+
+
+    postDaAggiornare.titolo = req.body.titolo;
+    postDaAggiornare.immagine = req.body.immagine;
+    postDaAggiornare.ingredienti = req.body.ingredienti;
+
+   
+    console.log(Posts)
+
+    
+    res.json(postDaAggiornare);
 }
 
 
 function modify(req, res) {
-    res.send('Modifica parziale del post' + req.params.id);
+
+ const id = parseInt(req.params.id)
+
+ const postDaModificare = Posts.find(post => post.id === id);
+
+    
+    if (!postDaModificare) {
+        res.status(404);
+
+        return res.json({
+            error: "Not Found",
+            message: "Post non trovato"
+        })
+    }
+
+    const postInviato = req.body;
+
+    
+ postInviato.titolo ? postDaModificare.titolo = postInviato.titolo : postDaModificare.titolo = postDaModificare.titolo
+
+ postInviato.immagine ? postDaModificare.immagine = postInviato.immagine : postDaModificare.immagine = postDaModificare.immagine
+
+ postInviato.ingredienti ? postDaModificare.ingredienti = postInviato.ingredienti : postDaModificare.ingredienti = postDaModificare.ingredienti
+
+    
+    console.log(Posts)
+
+    
+    res.json(postDaModificare);
 }
 
 

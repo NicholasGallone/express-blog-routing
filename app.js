@@ -6,6 +6,8 @@ const postsRouter = require('./routers/posts');
 
 app.use(express.static('public'));
 
+app.use(express.json());
+
 app.get('/', (req, res) => {
     res.send("Benvenuto, ora puoi vedere i miei post");
 })
