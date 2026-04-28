@@ -1,41 +1,32 @@
 const Posts = require('../data/singlePosts')
 
+const connection = require('../data/db')
 
 function index(req, res) {
 
-    let filtroPost = Posts;
+    const sql = 'SELECT * FROM db_blog';
 
-    if (req.query.ingrediente) {
-        filtroPost = Posts.filter(post=> post.ingredienti.includes(req.query.ingrediente));
-    }
+connection.query(sql, (err, results) => {
+if (err) return res.status(500).json({ error: 'Database query failed' });
+res.json(results);
 
-    const tuttiIpost = {
-        numeroPost: filtroPost.length,
-        listaDeiPost: filtroPost
-    }
-
-    res.json(tuttiIpost);
-}
+})};
 
 
 
 function show(req, res) {
-    const id = parseInt(req.params.id)
 
-    const postTrovato = Posts.find(post => post.id === id);
 
-    if (!postTrovato) {
+const id = req.params.id
+const sql = 'SELECT * FROM db_blog WHERE id = ?';
 
-        res.status(404)
+connection.query(sql, [id], (err, results) => {
+if (err) return res.status(500).json({ error: 'Database query failed' });
+if (results.length === 0) return res.status(404).json({ error: 'Post not found' });
+res.json(results[0])
 
-        return res.json({
-            errore: "Not Found",
-            messaggio: "Post non trovato"
-        })
-    }
+})};
 
-    res.json(postTrovato);
-}
 
 
 function store(req, res) {
@@ -124,29 +115,13 @@ function modify(req, res) {
 
 
 function destroy(req, res) {
-    
-    const id = parseInt(req.params.id)
+    const { id } = req.params;
 
-    const singoloPost = Posts.find(post => post.id === id);
+connection.query('DELETE FROM db_blog WHERE id = ?', [id], (err) => {
+if (err) return res.status(500).json({ error: 'Failed to delete pizza' });
+res.sendStatus(204)
+})}
 
-    
-    if (!singoloPost) {
-
-        res.status(404);
-
-        return res.json({
-            status: 404,
-            errore: "Not Found",
-            messaggio: "Post non trovata"
-        })
-    }
-
-    Posts.splice(Posts.indexOf(singoloPost), 1);
-
-    console.log(Posts);
-
-    res.sendStatus(204)
-}
 
 
 module.exports = { index, show, store, update, modify, destroy }
