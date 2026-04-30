@@ -1,4 +1,4 @@
-const Posts = require('../data/singlePosts')
+//const Posts = require('../data/singlePosts')
 
 const connection = require('../data/db')
 
@@ -30,54 +30,34 @@ res.json(results[0])
 
 
 function store(req, res) {
-  // res.send('Creazione nuovo post');
+    
+const { title, image } = req.body;
 
-   const nuovoId = Date.now();
+const sql = 'INSERT INTO db_blog (title, image) VALUES (?, ?)'
 
-    const nuovoPost = {
-        id: nuovoId,
-        titolo: req.body.titolo,
-        immagine: req.body.immagine,
-        ingredienti: req.body.ingredienti
-    }
-
-    Posts.push(nuovoPost);
-
-    console.log(Posts);
-
-
-    res.status(201);
-
-    res.json(nuovoPost);
-
+connection.query(
+sql,
+[title, image],
+(err, results) => {
+if (err) return res.status(500).json({ error: 'Failed to insert the post' });
+res.status(201); 
+console.log(results)
+res.json({ id: results.insertId });
+}
+);
 }
 
 function update(req, res) {
-
-    const id = parseInt(req.params.id)
-    
-    const postDaAggiornare = Posts.find(post => post.id === id);
-
-   
-    if (!postDaAggiornare) {
-        res.status(404);
-
-        return res.json({
-            error: "Not Found",
-            message: "Post non trovato"
-        })
-    }
-
-
-    postDaAggiornare.titolo = req.body.titolo;
-    postDaAggiornare.immagine = req.body.immagine;
-    postDaAggiornare.ingredienti = req.body.ingredienti;
-
-   
-    console.log(Posts)
-
-    
-    res.json(postDaAggiornare);
+const { id } = req.params;
+const { title, image } = req.body;
+connection.query(
+'UPDATE db_blog SET title = ?, image = ? WHERE id = ?',
+[title, image, id],
+(err) => {
+if (err) return res.status(500).json({ error: 'Failed to update pizza' });
+res.json({ message: 'Post updated successfully' });
+}
+);
 }
 
 
@@ -118,7 +98,7 @@ function destroy(req, res) {
     const { id } = req.params;
 
 connection.query('DELETE FROM db_blog WHERE id = ?', [id], (err) => {
-if (err) return res.status(500).json({ error: 'Failed to delete pizza' });
+if (err) return res.status(500).json({ error: 'Failed to delete the post' });
 res.sendStatus(204)
 })}
 
